@@ -53,7 +53,6 @@ xgb = XGBRegressor(learning_rate=0.01, n_estimators=3460,
                    reg_alpha=0.00006)
 xgb.fit(X_train, y_train)
 
-
 y_pred_xgb = xgb.predict(X_test)
 
 # Calculate accuracy score xgbregression
