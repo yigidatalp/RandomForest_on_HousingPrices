@@ -36,7 +36,7 @@ correlation = df_train.corr()
 correlation_saleprice = abs(correlation['SalePrice'])
 correlation_saleprice = correlation_saleprice[features]
 selected_features = [
-    idx for idx in correlation_saleprice.index if idx != 'Exterior2nd_Other' and correlation_saleprice.loc[idx] > 0.045]
+    idx for idx in correlation_saleprice.index if idx != 'Exterior2nd_Other' and correlation_saleprice.loc[idx] > 0.04]
 
 # Split train and test
 X = df_train[selected_features]
