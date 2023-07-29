@@ -36,12 +36,13 @@ correlation = df_train.corr()
 correlation_saleprice = abs(correlation['SalePrice'])
 correlation_saleprice = correlation_saleprice[features]
 selected_features = [
-    idx for idx in correlation_saleprice.index if idx != 'Exterior2nd_Other' and correlation_saleprice.loc[idx] > 0.04]
+    idx for idx in correlation_saleprice.index if correlation_saleprice.loc[idx] > 0.005]
 
 # Split train and test
 X = df_train[selected_features]
 y = df_train['SalePrice']
-X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, train_size=0.8, test_size=0.2, random_state=0)
 
 # Train the xgbregression model on train set
 xgb = XGBRegressor(learning_rate=0.01, n_estimators=3460,
@@ -67,8 +68,15 @@ xgb_full_data = XGBRegressor(learning_rate=0.01, n_estimators=3460,
                              objective='reg:squarederror', nthread=-1,
                              scale_pos_weight=1, seed=27,
                              reg_alpha=0.00006)
-xgb_full_data.fit(X, y)
 
+# Remove some missing columns according to test set
+selected_features_test = [col for col in selected_features if col not in ['Utilities_NoSeWa', 'Condition2_RRAn', 'Condition2_RRNn', 'HouseStyle_2.5Fin',
+                                                                          'RoofMatl_ClyTile', 'RoofMatl_Membran', 'RoofMatl_Roll', 'Exterior1st_ImStucc', 'Exterior1st_Stone', 'Exterior2nd_Other', 'Heating_Floor', 'Heating_OthW']]
+
+# Fit full data based on selected features according to test data
+xgb_full_data.fit(X[selected_features_test], y)
+
+# Import the test data
 df_test = pd.read_csv('test.csv')
 
 # Dataset information
@@ -78,17 +86,15 @@ df_test_describe = df_test.describe()
 # Split categorical variables
 df_test = pd.get_dummies(df_test)
 
-test_X = df_test[selected_features]
+# assing selected features according to test data
+test_X = df_test[selected_features_test]
 
-sum_isna_test = test_X.isna().sum()
-test_X.info()
-
+# Fill missing values
 for col in test_X.columns:
-    if test_X[col].isna().sum() >= 1 and test_X[col].dtype != 'object':
-        test_X[col] = test_X[col].fillna(round(test_X[col].mode()[0]))
+    if test_X[col].isna().sum() >= 1:
+        test_X[col] = test_X[col].fillna(test_X[col].mode()[0])
 
-sum_isna_test = test_X.isna().sum()
-
+# Predict test set
 test_preds_xgb = xgb_full_data.predict(test_X)
 
 # Create submission csv
