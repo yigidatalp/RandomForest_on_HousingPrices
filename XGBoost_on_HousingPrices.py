@@ -23,8 +23,6 @@ for col in df_train.columns:
     if df_train[col].isna().sum() >= 1:
         df_train = df_train.drop(col, axis=1)
 
-df_train.info()
-
 # Split categorical variables
 df_train = pd.get_dummies(df_train)
 
