@@ -31,7 +31,7 @@ features = [col for col in df_train.columns if col not in ['Id', 'SalePrice']]
 
 # Correlation & Feature selection
 correlation = abs(df_train[features].corrwith(df_train['SalePrice']))
-
+correlation.name = 'Corr Scores'
 selected_features = [
     idx for idx in correlation.index if correlation.loc[idx] >= 0.005]
 
