@@ -34,7 +34,7 @@ correlation = df_train.corr()
 correlation_saleprice = abs(correlation['SalePrice'])
 correlation_saleprice = correlation_saleprice[features]
 selected_features = [
-    idx for idx in correlation_saleprice.index if correlation_saleprice.loc[idx] > 0.005]
+    idx for idx in correlation_saleprice.index if correlation_saleprice.loc[idx] >= 0.005]
 
 # Split train and test
 X = df_train[selected_features]
@@ -50,6 +50,7 @@ xgb = XGBRegressor(learning_rate=0.01, n_estimators=3460,
                    objective='reg:squarederror', nthread=-1,
                    scale_pos_weight=1, seed=27,
                    reg_alpha=0.00006)
+
 xgb.fit(X_train, y_train)
 
 y_pred_xgb = xgb.predict(X_test)
