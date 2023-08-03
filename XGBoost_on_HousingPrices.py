@@ -29,12 +29,11 @@ df_train = pd.get_dummies(df_train)
 # Features
 features = [col for col in df_train.columns if col not in ['Id', 'SalePrice']]
 
-# Correlation
-correlation = df_train.corr()
-correlation_saleprice = abs(correlation['SalePrice'])
-correlation_saleprice = correlation_saleprice[features]
+# Correlation & Feature selection
+correlation = abs(df_train[features].corrwith(df_train['SalePrice']))
+
 selected_features = [
-    idx for idx in correlation_saleprice.index if correlation_saleprice.loc[idx] >= 0.005]
+    idx for idx in correlation.index if correlation.loc[idx] >= 0.005]
 
 # Split train and test
 X = df_train[selected_features]
